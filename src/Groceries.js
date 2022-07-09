@@ -1,9 +1,9 @@
 import React from 'react';
 import axios from 'axios';
-
 import { connect } from 'react-redux';
+import { toggle, create, deleteGroc } from './store';
 
-const _Groceries = ({ groceries, view, toggle, create })=> {
+const _Groceries = ({ groceries, view, toggle, create, deleteGroc })=> {
   return (
     <div>
       <button onClick={ create }>Create</button>
@@ -11,7 +11,10 @@ const _Groceries = ({ groceries, view, toggle, create })=> {
         {
           groceries.filter(grocery => !view || ( grocery.purchased && view === 'purchased') ||( !grocery.purchased && view === 'needs') ).map( grocery => {
             return (
-              <li onClick={ ()=> toggle(grocery)} key={ grocery.id } className={ grocery.purchased ? 'purchased': ''}>{ grocery.name }</li>
+              <div>
+              <li onClick={ ()=> toggle(grocery)} key={ grocery.id } className={ grocery.purchased ? 'purchased': ''}> { grocery.name } </li>
+              <button onClick={()=>{deleteGroc(grocery)}}>X</button>
+              </div>
             );
           })
         }
@@ -22,16 +25,16 @@ const _Groceries = ({ groceries, view, toggle, create })=> {
 
 const mapDispatchToProps = (dispatch)=> {
   return {
-    toggle: async(grocery)=>{
-      const updated = (await axios.put(`/api/groceries/${grocery.id}`, { purchased: !grocery.purchased })).data;
-      dispatch({ type: 'UPDATE', grocery: updated});
-
+    toggle: (grocery)=>{
+      dispatch(toggle(grocery));
     }, 
-    create: async()=>{
-      const grocery = (await axios.post('/api/groceries/random')).data;
-      dispatch({ type: 'CREATE', grocery });
-
-    } 
+    create: ()=>{
+      dispatch(create());
+    },
+    deleteGroc: (grocery)=>{
+      console.log(grocery)
+      dispatch(deleteGroc(grocery))
+    }
   };
 };
 

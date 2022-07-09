@@ -19,6 +19,18 @@ app.get('/api/groceries', async(req, res, next)=> {
   }
 });
 
+app.delete('/api/groceries/:id', async(req,res,next) => {
+  try {
+
+    const thing = await Grocery.findByPk(req.params.id);
+    await thing.destroy();
+    res.sendStatus(204);
+
+  }catch(er){
+    next(er);
+  }
+})
+
 app.put('/api/groceries/:id', async(req, res, next)=> {
   try {
     const grocery = await Grocery.findByPk(req.params.id);
@@ -62,7 +74,7 @@ const init = async()=> {
 const Sequelize = require('sequelize');
 const { STRING, BOOLEAN } = Sequelize;
 const conn = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost/acme_grocery_db');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 
 const Grocery = conn.define('grocery', {
   name: {
